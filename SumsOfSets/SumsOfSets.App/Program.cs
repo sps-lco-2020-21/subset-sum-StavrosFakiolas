@@ -10,13 +10,13 @@ namespace SumsOfSets.App
     {
         static void Main(string[] args)
         {
-            List<int> pog = new List<int> { 4, 10, 6, 17, 43, 7, 1, 9, 85, 10};
-            foreach(int i in pog)
+            List<int> pog = new List<int> { 43, 8, 7, 6 };
+            foreach (int i in pog)
             {
                 Console.WriteLine(i);
             }
-            int target = 29; //breaks on 39? can you even sum that?
-            Console.ReadKey(); // numbers larger than like 43 start to break real fast i dont know why
+            int target = 56; 
+            Console.ReadKey(); 
             List<int> pog2 = Step1(pog, target);
             Console.WriteLine("\n");
             foreach(int i in pog2)
@@ -53,6 +53,7 @@ namespace SumsOfSets.App
             {
                 numsStack.Push(nums[i]);
                 original.Push(nums[i]);
+
             }
             original.Pop();
             int result = 0;
@@ -69,6 +70,17 @@ namespace SumsOfSets.App
                 {
                     int help = numsStack.Pop();
                     resultList.Add(help);
+                    if (numsStack.Count >= 2 && numsStack.Count < original.Count) //stack big enough for more combinations to need to be adressed -second case?
+                    {
+                        Stack<int> temp = numsStack;
+                        List<int> empty = new List<int> { 0 };
+                        temp.Push(result - help);
+                        List<int> momentOfTruth = Step3Induction(temp, target);
+                        if (momentOfTruth != empty)
+                        {
+                            return momentOfTruth;
+                        }
+                    }
                 }
                 else if(result > target)
                 {
@@ -87,32 +99,43 @@ namespace SumsOfSets.App
         {
             int result = 0;
             Stack<int> original = numsStack;
-            if(original.Count == 0)
+            if(numsStack.Count == 0)
             {
-                Console.WriteLine("Solution not found");
                 return new List<int>{ 0 };
             }
             List<int> resultList = new List<int>();
             while (result != target)
             {
-                if (numsStack.Count == 0)
+                if (original.Count == 0)
                 {
-                    List<int> correct = Step3Induction(original, target);
+                    List<int> correct = Step3Induction(numsStack, target);
                     return correct;
                 }
-                result = result + numsStack.Peek();
+                result = result + original.Peek();
                 if (result < target)
                 {
-                    int help = numsStack.Pop();
+                    int help = original.Pop();
                     resultList.Add(help);
+                    if (original.Count >= 2 && original.Count < numsStack.Count) //stack big enough for more combinations to need to be adressed -second case?
+                    {
+                        Stack<int> temp = original;
+                        List<int> empty = new List<int> { 0 };
+                        temp.Push(result - help);
+                        List<int> momentOfTruth = Step3Induction(temp, target);
+                        if (momentOfTruth != empty)
+                        {
+                            return momentOfTruth;
+                        }
+                    }
+
                 }
                 else if (result > target)
                 {
-                    int help2 = numsStack.Pop();
+                    int help2 = original.Pop();
                     result = result - help2;
                 }
             }
-            int help3 = numsStack.Pop();
+            int help3 = original.Pop();
             resultList.Add(help3);
             return resultList;
         }
